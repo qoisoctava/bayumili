@@ -1,0 +1,45 @@
+{% extends 'base.html' %} {% block title %}Dashboard - BayuMili{% endblock %} {%
+block page_title %}Dashboard{% endblock %} {% block content %}
+<div class="row">
+  <div class="col-12">
+    <h4>Welcome to BayuMili! 👋</h4>
+    <p class="text-muted">Your task scheduler dashboard</p>
+  </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mt-3">
+  <div class="col-md-3">
+    <div class="card text-white bg-primary">
+      <div class="card-body">
+        <h6 class="card-title">Total Tasks</h6>
+        <h2>0</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-white bg-success">
+      <div class="card-body">
+        <h6 class="card-title">Successful Runs</h6>
+        <h2>0</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-white bg-danger">
+      <div class="card-body">
+        <h6 class="card-title">Failed Runs</h6>
+        <h2>0</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-white bg-warning">
+      <div class="card-body">
+        <h6 class="card-title">Running Now</h6>
+        <h2>0</h2>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

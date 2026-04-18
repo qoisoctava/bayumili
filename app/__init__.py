@@ -15,6 +15,9 @@ def create_app(config_name="default"):
     migrate.init_app(app, db)
     csrf.init_app(app)
 
+    # Import models here so Flask-Migrate can detect them
+    from app.models import User, Task, TaskRun, TaskLog, EnvVar, AlertConfig
+
     # Register blueprints
     from app.routes.auth import auth_bp
     from app.routes.dashboard import dashboard_bp
