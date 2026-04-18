@@ -1,0 +1,154 @@
+{% extends 'base.html' %} {% block title %}{{ task.name }} - BayuMili{% endblock
+%} {% block page_title %}Task Detail{% endblock %} {% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4>{{ task.name }}</h4>
+  <div class="d-flex gap-2">
+    {% if current_user.is_authenticated %}
+    <!-- Trigger Button -->
+    <form action="{{ url_for('tasks.trigger', id=task.id) }}" method="POST">
+      {{ csrf_token() }}
+      <button
+        type="submit"
+        class="btn btn-success"
+        onclick="return confirm('Trigger task {{ task.name }} manually?')"
+      >
+        <i class="bi bi-play-circle"></i> Trigger Now
+      </button>
+    </form>
+    <!-- Toggle Button -->
+    <form action="{{ url_for('tasks.toggle', id=task.id) }}" method="POST">
+      {{ csrf_token() }}
+      <button
+        type="submit"
+        class="btn btn-{{ 'warning' if task.is_active else 'success' }}"
+      >
+        <i
+          class="bi bi-{{ 'pause-circle' if task.is_active else 'play-circle' }}"
+        ></i>
+        {{ 'Deactivate' if task.is_active else 'Activate' }}
+      </button>
+    </form>
+    <a href="{{ url_for('tasks.edit', id=task.id) }}" class="btn btn-primary">
+      <i class="bi bi-pencil"></i> Edit
+    </a>
+    {% endif %}
+    <a href="{{ url_for('tasks.index') }}" class="btn btn-secondary">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Task Info -->
+  <div class="col-md-6">
+    <div class="card mb-4">
+      <div class="card-header"><strong>Task Information</strong></div>
+      <div class="card-body">
+        <table class="table table-sm mb-0">
+          <tr>
+            <th>Name</th>
+            <td>{{ task.name }}</td>
+          </tr>
+          <tr>
+            <th>Description</th>
+            <td>{{ task.description or '-' }}</td>
+          </tr>
+          <tr>
+            <th>Script Path</th>
+            <td><code>{{ task.script_path }}</code></td>
+          </tr>
+          <tr>
+            <th>Cron</th>
+            <td><code>{{ task.cron_expression }}</code></td>
+          </tr>
+          <tr>
+            <th>Retries</th>
+            <td>{{ task.retries }}</td>
+          </tr>
+          <tr>
+            <th>Retry Delay</th>
+            <td>{{ task.retry_delay }} minutes</td>
+          </tr>
+          <tr>
+            <th>SLA</th>
+            <td>
+              {{ task.sla_minutes ~ ' minutes' if task.sla_minutes else '-' }}
+            </td>
+          </tr>
+          <tr>
+            <th>Status</th>
+            <td>
+              {% if task.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-secondary">Inactive</span>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <th>Created</th>
+            <td>{{ task.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Runs -->
+  <div class="col-md-6">
+    <div class="card mb-4">
+      <div class="card-header"><strong>Recent Runs (Last 10)</strong></div>
+      <div class="card-body p-0">
+        {% if runs %}
+        <table class="table table-sm mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>Run ID</th>
+              <th>Status</th>
+              <th>Trigger</th>
+              <th>Duration</th>
+              <th>Started</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for run in runs %}
+            <tr>
+              <td>#{{ run.id }}</td>
+              <td>
+                {% if run.status == 'success' %}
+                <span class="badge bg-success">success</span>
+                {% elif run.status == 'failed' %}
+                <span class="badge bg-danger">failed</span>
+                {% elif run.status == 'running' %}
+                <span class="badge bg-primary">running</span>
+                {% elif run.status == 'retrying' %}
+                <span class="badge bg-warning">retrying</span>
+                {% else %}
+                <span class="badge bg-secondary">pending</span>
+                {% endif %}
+              </td>
+              <td>{{ run.triggered_by }}</td>
+              <td>
+                {% if run.duration %} {{ "%.1f"|format(run.duration) }}s {% else
+                %} - {% endif %}
+              </td>
+              <td>
+                <small>
+                  {{ run.started_at.strftime('%Y-%m-%d %H:%M') if run.started_at
+                  else '-' }}
+                </small>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-4 text-muted">
+          <i class="bi bi-clock-history"></i> No runs yet
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

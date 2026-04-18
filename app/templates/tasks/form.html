@@ -1,0 +1,141 @@
+{% extends 'base.html' %} {% block title %}{{ title }} - BayuMili{% endblock %}
+{% block page_title %}{{ title }}{% endblock %} {% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-body p-4">
+        <form method="POST">
+          {{ form.hidden_tag() }}
+
+          <div class="mb-3">
+            <label class="form-label">Task Name *</label>
+            {{ form.name(class="form-control") }} {% if form.name.errors %}
+            <div class="text-danger small">{{ form.name.errors[0] }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            {{ form.description(class="form-control", rows=3) }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Script Path *</label>
+            {{ form.script_path(class="form-control",
+            placeholder="/path/to/script.py") }} {% if form.script_path.errors
+            %}
+            <div class="text-danger small">
+              {{ form.script_path.errors[0] }}
+            </div>
+            {% endif %}
+            <small class="text-muted"
+              >Full path to the Python script on the server</small
+            >
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Cron Expression *</label>
+            {{ form.cron_expression(class="form-control", placeholder="* * * *
+            *") }} {% if form.cron_expression.errors %}
+            <div class="text-danger small">
+              {{ form.cron_expression.errors[0] }}
+            </div>
+            {% endif %}
+            <small class="text-muted">
+              Format: minute hour day month weekday (e.g.
+              <code>0 9 * * *</code> = every day at 9am)
+            </small>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Retries</label>
+                {{ form.retries(class="form-control") }} {% if
+                form.retries.errors %}
+                <div class="text-danger small">
+                  {{ form.retries.errors[0] }}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Retry Delay (minutes)</label>
+                {{ form.retry_delay(class="form-control") }} {% if
+                form.retry_delay.errors %}
+                <div class="text-danger small">
+                  {{ form.retry_delay.errors[0] }}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">SLA (minutes)</label>
+                {{ form.sla_minutes(class="form-control",
+                placeholder="Optional") }}
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-check">
+              {{ form.is_active(class="form-check-input") }}
+              <label class="form-check-label">Active</label>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('tasks.index') }}" class="btn btn-secondary"
+              >Cancel</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cron Helper -->
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <strong>Cron Expression Guide</strong>
+      </div>
+      <div class="card-body">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Expression</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>* * * * *</code></td>
+              <td>Every minute</td>
+            </tr>
+            <tr>
+              <td><code>0 * * * *</code></td>
+              <td>Every hour</td>
+            </tr>
+            <tr>
+              <td><code>0 9 * * *</code></td>
+              <td>Daily at 9am</td>
+            </tr>
+            <tr>
+              <td><code>0 9 * * 1</code></td>
+              <td>Every Monday 9am</td>
+            </tr>
+            <tr>
+              <td><code>0 0 1 * *</code></td>
+              <td>Monthly 1st</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
