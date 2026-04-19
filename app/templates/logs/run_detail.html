@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Run #{{ run.id }} Logs - BayuMili{% endblock %}
+{% block page_title %}Run Detail{% endblock %}
+
+{% block content %}
+<!-- Run Info -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4>Run #{{ run.id }} — {{ run.task.name }}</h4>
+    <a href="{{ url_for('logs.index') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+<!-- Run Summary -->
+<div class="card mb-4">
+    <div class="card-header"><strong>Run Summary</strong></div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <small class="text-muted">Status</small>
+                <div>
+                    {% if run.status == 'success' %}
+                        <span class="badge bg-success fs-6">success</span>
+                    {% elif run.status == 'failed' %}
+                        <span class="badge bg-danger fs-6">failed</span>
+                    {% elif run.status == 'running' %}
+                        <span class="badge bg-primary fs-6">running</span>
+                    {% elif run.status == 'retrying' %}
+                        <span class="badge bg-warning text-dark fs-6">retrying</span>
+                    {% else %}
+                        <span class="badge bg-secondary fs-6">pending</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted">Triggered By</small>
+                <div>
+                    <span class="badge bg-{{ 'info' if run.triggered_by == 'manual' else 'secondary' }} fs-6">
+                        {{ run.triggered_by }}
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted">Attempt</small>
+                <div class="fw-bold">{{ run.attempt }}</div>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted">Duration</small>
+                <div class="fw-bold">
+                    {{ "%.1f"|format(run.duration) ~ 's' if run.duration else '-' }}
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-6">
+                <small class="text-muted">Started At</small>
+                <div>{{ run.started_at.strftime('%Y-%m-%d %H:%M:%S') if run.started_at else '-' }}</div>
+            </div>
+            <div class="col-md-6">
+                <small class="text-muted">Finished At</small>
+                <div>{{ run.finished_at.strftime('%Y-%m-%d %H:%M:%S') if run.finished_at else '-' }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Log Filter -->
+<div class="card mb-4">
+    <div class="card-body py-2">
+        <form method="GET" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Filter by Level</label>
+                <select name="level" class="form-select form-select-sm">
+                    <option value="">All Levels</option>
+                    <option value="INFO" {{ 'selected' if selected_level == 'INFO' }}>INFO</option>
+                    <option value="WARNING" {{ 'selected' if selected_level == 'WARNING' }}>WARNING</option>
+                    <option value="ERROR" {{ 'selected' if selected_level == 'ERROR' }}>ERROR</option>
+                    <option value="DEBUG" {{ 'selected' if selected_level == 'DEBUG' }}>DEBUG</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-search"></i> Filter
+                </button>
+                <a href="{{ url_for('logs.run_detail', run_id=run.id) }}"
+                   class="btn btn-secondary btn-sm">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Log Output -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <strong>Log Output</strong>
+        <small class="text-muted">{{ logs|length }} entries</small>
+    </div>
+    <div class="card-body p-0">
+        {% if logs %}
+        <div class="bg-dark text-light p-3 rounded"
+             style="font-family: monospace; font-size: 0.85rem; max-height: 600px; overflow-y: auto;">
+            {% for log in logs %}
+            <div class="mb-1">
+                <span class="text-muted">{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                {% if log.level == 'INFO' %}
+                    <span class="text-info">[INFO]</span>
+                {% elif log.level == 'WARNING' %}
+                    <span class="text-warning">[WARNING]</span>
+                {% elif log.level == 'ERROR' %}
+                    <span class="text-danger">[ERROR]</span>
+                {% elif log.level == 'DEBUG' %}
+                    <span class="text-secondary">[DEBUG]</span>
+                {% endif %}
+                <span>{{ log.message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-journal-x display-4"></i>
+            <p class="mt-2">No log entries found.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
