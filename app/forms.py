@@ -15,9 +15,7 @@ class LoginForm(FlaskForm):
         "Username",
         validators=[
             DataRequired(message="Username is required"),
-            Length(
-                min=3, max=80, message="Username must be between 3 and 80 characters"
-            ),
+            Length(min=3, max=80),
         ],
     )
     password = PasswordField(
@@ -31,9 +29,7 @@ class TaskForm(FlaskForm):
         "Task Name",
         validators=[
             DataRequired(message="Task name is required"),
-            Length(
-                min=3, max=120, message="Task name must be between 3 and 120 characters"
-            ),
+            Length(min=3, max=120),
         ],
     )
     description = TextAreaField("Description", validators=[Optional()])
@@ -49,21 +45,24 @@ class TaskForm(FlaskForm):
         ],
     )
     retries = IntegerField(
-        "Retries",
-        default=0,
-        validators=[
-            NumberRange(min=0, max=10, message="Retries must be between 0 and 10")
-        ],
+        "Retries", default=0, validators=[NumberRange(min=0, max=10)]
     )
     retry_delay = IntegerField(
-        "Retry Delay (minutes)",
-        default=5,
-        validators=[
-            NumberRange(
-                min=1, max=60, message="Retry delay must be between 1 and 60 minutes"
-            )
-        ],
+        "Retry Delay (minutes)", default=5, validators=[NumberRange(min=1, max=60)]
     )
     sla_minutes = IntegerField("SLA (minutes)", validators=[Optional()])
     is_active = BooleanField("Active", default=True)
     submit = SubmitField("Save Task")
+
+
+class EnvVarForm(FlaskForm):
+    key = StringField(
+        "Key",
+        validators=[
+            DataRequired(message="Key is required"),
+            Length(min=1, max=120, message="Key must be between 1 and 120 characters"),
+        ],
+    )
+    value = StringField("Value", validators=[DataRequired(message="Value is required")])
+    description = StringField("Description", validators=[Optional(), Length(max=255)])
+    submit = SubmitField("Save")

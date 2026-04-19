@@ -1,0 +1,96 @@
+{% extends 'base.html' %} {% block title %}{{ title }} - BayuMili{% endblock %}
+{% block page_title %}{{ title }}{% endblock %} {% block content %}
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body p-4">
+        <form method="POST">
+          {{ form.hidden_tag() }}
+
+          <div class="mb-3">
+            <label class="form-label">Key *</label>
+            {{ form.key(class="form-control", placeholder="e.g. DB_PASSWORD") }}
+            {% if form.key.errors %}
+            <div class="text-danger small">{{ form.key.errors[0] }}</div>
+            {% endif %}
+            <small class="text-muted">
+              Use uppercase with underscores (e.g. API_KEY, DB_HOST)
+            </small>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Value *</label>
+            <div class="input-group">
+              {{ form.value(class="form-control", id="valueInput",
+              placeholder="Enter value to encrypt") }}
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                onclick="toggleValueVisibility()"
+              >
+                <i class="bi bi-eye" id="toggleIcon"></i>
+              </button>
+            </div>
+            {% if form.value.errors %}
+            <div class="text-danger small">{{ form.value.errors[0] }}</div>
+            {% endif %} {% if env_var %}
+            <small class="text-warning">
+              <i class="bi bi-exclamation-triangle"></i>
+              Leave blank will keep the current value
+            </small>
+            {% else %}
+            <small class="text-muted">
+              Value will be encrypted using Fernet encryption
+            </small>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            {{ form.description(class="form-control", placeholder="Optional
+            description") }}
+          </div>
+
+          <div class="d-flex gap-2">
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('envs.index') }}" class="btn btn-secondary"
+              >Cancel</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Card -->
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <strong><i class="bi bi-shield-lock"></i> Security Info</strong>
+      </div>
+      <div class="card-body">
+        <ul class="mb-0">
+          <li>Values are encrypted using <strong>Fernet (AES-128)</strong></li>
+          <li>Encrypted values are stored in the database</li>
+          <li>Only admin can reveal the original value</li>
+          <li>Keys follow the format: <code>UPPER_SNAKE_CASE</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  function toggleValueVisibility() {
+    const input = document.getElementById("valueInput");
+    const icon = document.getElementById("toggleIcon");
+    if (input.type === "password") {
+      input.type = "text";
+      icon.className = "bi bi-eye-slash";
+    } else {
+      input.type = "password";
+      icon.className = "bi bi-eye";
+    }
+  }
+</script>
+{% endblock %}
