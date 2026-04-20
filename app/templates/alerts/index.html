@@ -65,7 +65,11 @@ block page_title %}Alert Configurations{% endblock %} {% block content %}
               method="POST"
               class="d-inline"
             >
-              {{ csrf_token() }}
+              <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+              />
               <button
                 type="submit"
                 class="btn btn-sm btn-outline-{{ 'warning' if alert.is_active else 'success' }}"
@@ -90,7 +94,11 @@ block page_title %}Alert Configurations{% endblock %} {% block content %}
               class="d-inline"
               onsubmit="return confirm('Delete this alert config?');"
             >
-              {{ csrf_token() }}
+              <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+              />
               <button type="submit" class="btn btn-sm btn-outline-danger">
                 <i class="bi bi-trash"></i>
               </button>

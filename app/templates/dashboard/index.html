@@ -1,43 +1,261 @@
 {% extends 'base.html' %} {% block title %}Dashboard - BayuMili{% endblock %} {%
 block page_title %}Dashboard{% endblock %} {% block content %}
-<div class="row">
-  <div class="col-12">
+<!-- Welcome -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
     <h4>Welcome to BayuMili! 👋</h4>
-    <p class="text-muted">Your task scheduler dashboard</p>
+    <p class="text-muted mb-0">Task Scheduler Dashboard</p>
+  </div>
+  <small class="text-muted">
+    <i class="bi bi-clock"></i>
+    Last updated: {{ datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') }} UTC
+  </small>
+</div>
+
+<!-- Stats Cards Row 1 -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-muted">Total Tasks</small>
+            <h3 class="mb-0">{{ total_tasks }}</h3>
+            <small class="text-success"> {{ active_tasks }} active </small>
+          </div>
+          <div class="bg-primary bg-opacity-10 rounded p-3">
+            <i class="bi bi-list-task text-primary fs-4"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-muted">Total Runs</small>
+            <h3 class="mb-0">{{ total_runs }}</h3>
+            <small class="text-muted"> {{ recent_runs }} last 7 days </small>
+          </div>
+          <div class="bg-info bg-opacity-10 rounded p-3">
+            <i class="bi bi-play-circle text-info fs-4"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-muted">Successful Runs</small>
+            <h3 class="mb-0 text-success">{{ success_runs }}</h3>
+            <small class="text-muted">
+              {% if total_runs > 0 %} {{ "%.1f"|format(success_runs / total_runs
+              * 100) }}% success rate {% else %} No runs yet {% endif %}
+            </small>
+          </div>
+          <div class="bg-success bg-opacity-10 rounded p-3">
+            <i class="bi bi-check-circle text-success fs-4"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-muted">Failed Runs</small>
+            <h3 class="mb-0 text-danger">{{ failed_runs }}</h3>
+            <small class="text-danger"> {{ recent_failed }} last 7 days </small>
+          </div>
+          <div class="bg-danger bg-opacity-10 rounded p-3">
+            <i class="bi bi-x-circle text-danger fs-4"></i>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- Stats Cards -->
-<div class="row mt-3">
-  <div class="col-md-3">
-    <div class="card text-white bg-primary">
-      <div class="card-body">
-        <h6 class="card-title">Total Tasks</h6>
-        <h2>0</h2>
+<!-- Running Now Banner -->
+{% if running_now > 0 %}
+<div class="alert alert-primary d-flex align-items-center mb-4" role="alert">
+  <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+  <strong>{{ running_now }} task(s) currently running...</strong>
+</div>
+{% endif %}
+
+<!-- Recent Runs & Failed Runs -->
+<div class="row g-3">
+  <!-- Latest Runs -->
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between">
+        <strong>Recent Runs</strong>
+        <a
+          href="{{ url_for('logs.index') }}"
+          class="btn btn-sm btn-outline-primary"
+        >
+          View All
+        </a>
+      </div>
+      <div class="card-body p-0">
+        {% if latest_runs %}
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Run ID</th>
+                <th>Task</th>
+                <th>Status</th>
+                <th>Triggered By</th>
+                <th>Duration</th>
+                <th>Started At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for run in latest_runs %}
+              <tr>
+                <td>
+                  <a
+                    href="{{ url_for('logs.run_detail', run_id=run.id) }}"
+                    class="text-decoration-none"
+                  >
+                    #{{ run.id }}
+                  </a>
+                </td>
+                <td>
+                  <a
+                    href="{{ url_for('tasks.detail', id=run.task.id) }}"
+                    class="text-decoration-none"
+                  >
+                    {{ run.task.name }}
+                  </a>
+                </td>
+                <td>
+                  {% if run.status == 'success' %}
+                  <span class="badge bg-success">success</span>
+                  {% elif run.status == 'failed' %}
+                  <span class="badge bg-danger">failed</span>
+                  {% elif run.status == 'running' %}
+                  <span class="badge bg-primary">running</span>
+                  {% elif run.status == 'retrying' %}
+                  <span class="badge bg-warning text-dark">retrying</span>
+                  {% else %}
+                  <span class="badge bg-secondary">pending</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span
+                    class="badge bg-{{ 'info' if run.triggered_by == 'manual' else 'secondary' }}"
+                  >
+                    {{ run.triggered_by }}
+                  </span>
+                </td>
+                <td>
+                  {{ "%.1f"|format(run.duration) ~ 's' if run.duration else '-'
+                  }}
+                </td>
+                <td>
+                  <small class="text-muted">
+                    {{ run.started_at.strftime('%Y-%m-%d %H:%M') if
+                    run.started_at else '-' }}
+                  </small>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+          <i class="bi bi-clock-history display-4"></i>
+          <p class="mt-2">No runs yet.</p>
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>
-  <div class="col-md-3">
-    <div class="card text-white bg-success">
-      <div class="card-body">
-        <h6 class="card-title">Successful Runs</h6>
-        <h2>0</h2>
+
+  <!-- Right Column -->
+  <div class="col-md-4">
+    <!-- Recent Failed -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white d-flex justify-content-between">
+        <strong class="text-danger">
+          <i class="bi bi-exclamation-triangle"></i> Recent Failures
+        </strong>
+        <a
+          href="{{ url_for('logs.index', status='failed') }}"
+          class="btn btn-sm btn-outline-danger"
+        >
+          View All
+        </a>
+      </div>
+      <div class="card-body p-0">
+        {% if failed_recent %}
+        <ul class="list-group list-group-flush">
+          {% for run in failed_recent %}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between">
+              <a
+                href="{{ url_for('logs.run_detail', run_id=run.id) }}"
+                class="text-decoration-none text-danger"
+              >
+                {{ run.task.name }}
+              </a>
+              <small class="text-muted"> #{{ run.id }} </small>
+            </div>
+            <small class="text-muted">
+              {{ run.created_at.strftime('%Y-%m-%d %H:%M') }}
+            </small>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <div class="text-center py-4 text-muted">
+          <i class="bi bi-emoji-smile"></i> No failures!
+        </div>
+        {% endif %}
       </div>
     </div>
-  </div>
-  <div class="col-md-3">
-    <div class="card text-white bg-danger">
-      <div class="card-body">
-        <h6 class="card-title">Failed Runs</h6>
-        <h2>0</h2>
+
+    <!-- Task Summary -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <strong>Task Summary</strong>
       </div>
-    </div>
-  </div>
-  <div class="col-md-3">
-    <div class="card text-white bg-warning">
-      <div class="card-body">
-        <h6 class="card-title">Running Now</h6>
-        <h2>0</h2>
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between">
+            <span>Total Tasks</span>
+            <span class="badge bg-primary">{{ total_tasks }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span>Active Tasks</span>
+            <span class="badge bg-success">{{ active_tasks }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span>Inactive Tasks</span>
+            <span class="badge bg-secondary">
+              {{ total_tasks - active_tasks }}
+            </span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span>Running Now</span>
+            <span
+              class="badge bg-{{ 'primary' if running_now > 0 else 'secondary' }}"
+            >
+              {{ running_now }}
+            </span>
+          </li>
+        </ul>
       </div>
     </div>
   </div>

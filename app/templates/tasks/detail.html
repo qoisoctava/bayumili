@@ -6,7 +6,7 @@
     {% if current_user.is_authenticated %}
     <!-- Trigger Button -->
     <form action="{{ url_for('tasks.trigger', id=task.id) }}" method="POST">
-      {{ csrf_token() }}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <button
         type="submit"
         class="btn btn-success"
@@ -17,7 +17,7 @@
     </form>
     <!-- Toggle Button -->
     <form action="{{ url_for('tasks.toggle', id=task.id) }}" method="POST">
-      {{ csrf_token() }}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <button
         type="submit"
         class="btn btn-{{ 'warning' if task.is_active else 'success' }}"
