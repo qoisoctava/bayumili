@@ -280,12 +280,12 @@ MIT License — feel free to use and modify.
 
 ## 👤 Author
 
-Built with ❤️ by **[Your Name]**
+Built with 🔥 by **qoisoctava** x Claude
 
-- GitHub: [@yourusername](https://github.com/yourusername)
+- GitHub: [@qoisoctava](https://github.com/qoisoctava)
 - Email: your@email.com
 
 ---
 
-> 💡 BayuMili means "owned by the wind" in Javanese —
+> 💡 Bayu means the air and Mili means the flow in Javanese —
 > letting your scripts run freely on a schedule!
