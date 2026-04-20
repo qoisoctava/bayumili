@@ -283,7 +283,6 @@ MIT License — feel free to use and modify.
 Built with 🔥 by **qoisoctava** x Claude
 
 - GitHub: [@qoisoctava](https://github.com/qoisoctava)
-- Email: your@email.com
 
 ---
 
