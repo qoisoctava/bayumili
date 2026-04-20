@@ -1,0 +1,129 @@
+{% extends 'base.html' %} {% block title %}{{ title }} - BayuMili{% endblock %}
+{% block page_title %}{{ title }}{% endblock %} {% block content %}
+<div class="row">
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <form method="POST">
+          {{ form.hidden_tag() }}
+
+          <!-- Task -->
+          <div class="mb-3">
+            <label class="form-label">Task *</label>
+            {{ form.task_id(class="form-select") }} {% if form.task_id.errors %}
+            <div class="text-danger small">{{ form.task_id.errors[0] }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Trigger -->
+          <div class="mb-3">
+            <label class="form-label">Trigger *</label>
+            {{ form.trigger(class="form-select") }} {% if form.trigger.errors %}
+            <div class="text-danger small">{{ form.trigger.errors[0] }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Channel -->
+          <div class="mb-3">
+            <label class="form-label">Channel *</label>
+            {{ form.channel(class="form-select") }} {% if form.channel.errors %}
+            <div class="text-danger small">{{ form.channel.errors[0] }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Recipient -->
+          <div class="mb-3">
+            <label class="form-label">Recipient Email *</label>
+            {{ form.recipient(class="form-control", placeholder="e.g.
+            admin@example.com") }} {% if form.recipient.errors %}
+            <div class="text-danger small">{{ form.recipient.errors[0] }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Active -->
+          <div class="mb-3">
+            <div class="form-check">
+              {{ form.is_active(class="form-check-input") }}
+              <label class="form-check-label">Active</label>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('alerts.index') }}" class="btn btn-secondary"
+              >Cancel</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trigger Guide -->
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header">
+        <strong><i class="bi bi-info-circle"></i> Trigger Guide</strong>
+      </div>
+      <div class="card-body">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Trigger</th>
+              <th>When</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <span class="badge bg-danger">on_failure</span>
+              </td>
+              <td>Task fails on any attempt</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="badge bg-warning text-dark"
+                  >on_retry_exhausted</span
+                >
+              </td>
+              <td>All retries are used up</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="badge bg-info text-dark">on_sla_breach</span>
+              </td>
+              <td>Task exceeds SLA duration</td>
+            </tr>
+            <tr>
+              <td>
+                <span class="badge bg-success">on_success</span>
+              </td>
+              <td>Task completes successfully</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SMTP Reminder -->
+    <div class="card mt-3">
+      <div class="card-header">
+        <strong><i class="bi bi-envelope"></i> SMTP Setup</strong>
+      </div>
+      <div class="card-body">
+        <p class="small text-muted mb-2">
+          Make sure your SMTP settings are configured in
+          <code>.env</code> file:
+        </p>
+        <pre class="bg-dark text-light p-2 rounded small">
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=user@example.com
+SMTP_PASSWORD=yourpassword
+SMTP_FROM=noreply@example.com</pre
+        >
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

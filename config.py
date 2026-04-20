@@ -22,8 +22,15 @@ class Config:
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # Log
-    LOG_RETENTION_DAYS = 90  # 3 months
+    # Log retention
+    LOG_RETENTION_DAYS = 90
+
+    # SMTP
+    SMTP_HOST = os.getenv("SMTP_HOST", "localhost")
+    SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
+    SMTP_USER = os.getenv("SMTP_USER", "")
+    SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+    SMTP_FROM = os.getenv("SMTP_FROM", "")
 
 
 class DevelopmentConfig(Config):

@@ -6,8 +6,9 @@ from wtforms import (
     TextAreaField,
     IntegerField,
     BooleanField,
+    SelectField,
 )
-from wtforms.validators import DataRequired, Length, Optional, NumberRange
+from wtforms.validators import DataRequired, Length, Optional, NumberRange, Email
 
 
 class LoginForm(FlaskForm):
@@ -58,11 +59,37 @@ class TaskForm(FlaskForm):
 class EnvVarForm(FlaskForm):
     key = StringField(
         "Key",
-        validators=[
-            DataRequired(message="Key is required"),
-            Length(min=1, max=120, message="Key must be between 1 and 120 characters"),
-        ],
+        validators=[DataRequired(message="Key is required"), Length(min=1, max=120)],
     )
     value = StringField("Value", validators=[DataRequired(message="Value is required")])
     description = StringField("Description", validators=[Optional(), Length(max=255)])
     submit = SubmitField("Save")
+
+
+class AlertConfigForm(FlaskForm):
+    task_id = SelectField(
+        "Task", coerce=int, validators=[DataRequired(message="Task is required")]
+    )
+    trigger = SelectField(
+        "Trigger",
+        choices=[
+            ("on_failure", "On Failure"),
+            ("on_retry_exhausted", "On Retry Exhausted"),
+            ("on_sla_breach", "On SLA Breach"),
+            ("on_success", "On Success"),
+        ],
+        validators=[DataRequired()],
+    )
+    channel = SelectField(
+        "Channel", choices=[("email", "Email")], validators=[DataRequired()]
+    )
+    recipient = StringField(
+        "Recipient Email",
+        validators=[
+            DataRequired(message="Recipient email is required"),
+            Email(message="Invalid email address"),
+            Length(max=120),
+        ],
+    )
+    is_active = BooleanField("Active", default=True)
+    submit = SubmitField("Save Alert")

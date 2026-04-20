@@ -98,12 +98,17 @@ block page_title %}Environment Variables{% endblock %} {% block content %}
       return;
     }
 
+    // Get CSRF token from meta tag
+    const csrfToken = document
+      .querySelector('meta[name="csrf-token"]')
+      .getAttribute("content");
+
     // Fetch decrypted value
     fetch(`/envs/${id}/reveal`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": "{{ csrf_token() }}",
+        "X-CSRFToken": csrfToken,
       },
     })
       .then((res) => res.json())
