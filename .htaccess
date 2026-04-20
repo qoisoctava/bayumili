@@ -1,0 +1,6 @@
+PassengerEnabled on
+PassengerStartupFile passenger_wsgi.py
+PassengerAppType wsgi
+PassengerAppRoot /home/octavamy/bayumili
+
+Options -MultiViews
